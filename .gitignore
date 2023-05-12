@@ -1,32 +1,320 @@
-# Prerequisites
-*.d
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <conio.h>
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+using namespace std;
+string GetPassword() {
+	string password;
+	char ch;
+	
+	while (true) {
+		ch = _getch();
+		
+		if (ch == 13) {
+			break;
+		} else if (ch == 8) {
+			if (!password.empty()) {
+				cout << "\b \b";
+				password.pop_back();
+			}
+		} else {
+			password.push_back(ch);
+			cout << "*";
+		}
+	}
+	
+	cout <<endl;
+	return password;
+}
+void dibujarAhorcado(int intentos) {
+	if (intentos >= 1) {
+		cout << "  O" << endl;
+	}
+	
+	if (intentos == 2) {
+		cout << " /";
+	} else if (intentos == 3) {
+		cout << " /|";
+	} else if (intentos >= 4) {
+		cout << " /|\\";
+	}
+	
+	cout << endl;
+	
+	if (intentos == 5) {
+		cout << " /";
+	} else if (intentos == 6) {
+		cout << " / \\" << endl;
+	}
+	else if (intentos == 7) {
+		cout << " / \\." << endl;
+	}
+}
 
-# Precompiled Headers
-*.gch
-*.pch
+bool adivinarLetra(char letra, string palabra, vector<char>& letrasCorrectas) {
+	bool adivinado = false;
+	
+	for (int i = 0; i < palabra.length(); i++) {
+		if (letra == palabra[i]) {
+			letrasCorrectas[i] = letra;
+			adivinado = true;
+		}
+	}
+	
+	return adivinado;
+}
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+bool palabraAdivinada(vector<char>& letrasCorrectas) {
+	for (char letra : letrasCorrectas) {
+		if (letra == '_') {
+			return false;
+		}
+	}
+	
+	return true;
+}
 
-# Fortran module files
-*.mod
-*.smod
+string obtenerPalabraAleatoria(vector<string> palabras) {
+	srand(time(0));
+	int indice = rand() % palabras.size();
+	
+	return palabras[indice];
+}
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+int main() {
+	vector<string> palabras = {};
+	vector<string> palabrasEspanol = {};
+	vector<string> palabrasIngles = {};
+	
+	while (true) {
+		cout << "***Bienvenido al juego del ahorcado****" << endl;
+		cout << "1. Configurar Palabras" << endl;
+		cout << "2. Jugar con la PC" << endl;
+		cout << "3. Jugar con un amigo" << endl;
+		cout << "4. Salir" << endl;
+		
+		int opcion;
+		cin >> opcion;
+		
+		switch (opcion) {
+		case 1: {
+			bool salir = false;
+			while (!salir) {
+				cout << "=== Menu Idioma ===" << endl;
+				cout << "1. Ingresar palabras en Spanish" << endl;
+				cout << "2. Enter English words" << endl;
+				cout << "3. Salir" << endl;
+				
+				int opcion;
+				cin >> opcion;
+				
+				switch (opcion) {
+				case 1: {
+					string nuevaPalabra;
+					cout << "Ingresa una nueva palabra: ";
+					cin >> nuevaPalabra;
+					palabrasEspanol.push_back(nuevaPalabra); // Agregar la nueva palabra al vector
+					cout << "¡Palabra agregada correctamente!" << endl;
+					
+					break;
+				}
+				
+				case 2: {
+					string nuevaPalabra;
+					cout << "Enter a new word: ";
+					cin >> nuevaPalabra;
+					palabrasIngles.push_back(nuevaPalabra); // Agregar la nueva palabra al vector
+					cout << "Word added successfully!" << endl;
+					break;
+				}
+				
+				case 3: {
+					
+					salir = true; // Cambiar la condición de salida
+					
+					break;
+				}
+				default:
+					cout << "Opción inválida. Por favor, selecciona una opción válida." << endl;
+					break;
+				}
+			}
+			
+			break;
+		}	
+		case 2: {
+			if (palabrasEspanol.empty() || palabrasIngles.empty()) {
+				cout << "!Por favor configura primero unas palabras en Spanish y english !" << endl;
+				
+				break;
+			} else {
+				
+				while (true) {
+					
+					
+					cout << "=== Menu Idioma ===" << endl;
+					cout << "1. Play in Spanish" << endl;
+					cout << "2. Play in english" << endl;
+					cout << "3. Exit" << endl;
+					
+					int opcion;
+					cin >> opcion;
+					
+					switch (opcion) {
+					case 1: {
+						string palabra = obtenerPalabraAleatoria(palabrasEspanol);
+						int intentos = 0;
+						vector<char> letrasCorrectas(palabra.length(), '_');
+						
+						while (intentos < 7) {
+							cout << endl;
+							dibujarAhorcado(intentos);
+							
+							cout << "Adivina la palabra: ";
+							for (char letra : letrasCorrectas) {
+								cout << letra << " ";
+							}
+							cout << endl;
+							
+							char letra;
+							cout << "Ingresa una letra: ";
+							cin >> letra;
+							
+							if (adivinarLetra(letra, palabra, letrasCorrectas)) {
+								cout << "¡Correcto!" << endl;
+								
+								if (palabraAdivinada(letrasCorrectas)) {
+									cout << "¡Felicidades! Has adivinado la palabra: " << palabra << endl;
+									break;
+								}
+							} else {
+								cout << "Incorrecto. Intenta de nuevo." << endl;
+								intentos++;
+							}
+						}
+						
+						if (intentos == 7) {
+							cout << endl;
+							dibujarAhorcado(intentos);
+							cout << "¡Has perdido! La palabra correcta era: " << palabra << endl;
+						}
+						break;
+					}
+					
+					case 2: {
+						string palabra = obtenerPalabraAleatoria(palabrasIngles);
+						int intentos = 0;
+						vector<char> letrasCorrectas(palabra.length(), '_');
+						
+						while (intentos < 7) {
+							cout << endl;
+							dibujarAhorcado(intentos);
+							
+							cout << "Adivina la palabra: ";
+							for (char letra : letrasCorrectas) {
+								cout << letra << " ";
+							}
+							cout << endl;
+							
+							char letra;
+							cout << "Ingresa una letra: ";
+							cin >> letra;
+							
+							if (adivinarLetra(letra, palabra, letrasCorrectas)) {
+								cout << "¡Correcto!" << endl;
+								
+								if (palabraAdivinada(letrasCorrectas)) {
+									cout << "¡Felicidades! Has adivinado la palabra: " << palabra << endl;
+									break;
+								}
+							} else {
+								cout << "Incorrecto. Intenta de nuevo." << endl;
+								intentos++;
+							}
+						}
+						
+						if (intentos == 7) {
+							cout << endl;
+							dibujarAhorcado(intentos);
+							cout << "¡Has perdido! La palabra correcta era: " << palabra << endl;
+						}
+						break;
+					}
+					
+					case 3:
+						cout << "¡Hasta luego!" << endl;
+						return 0;
+						
+					default:
+						cout << "Opción inválida. Por favor, selecciona una opción válida." << endl;
+						break;
+					}
+				}
+				
+				
+				
+			}
+		}
+		
+		case 3: {
+			string palabra;
+			cout << "Jugador 1, ingresa la palabra a adivinar (en minúsculas): ";
+			palabra = GetPassword();
+			cout << "Palabra Registrada: "<< endl;
+			
+			
+			int intentos = 0;
+			vector<char> letrasCorrectas(palabra.length(), '_');
+			
+			while (intentos < 6) {
+				cout << endl;
+				dibujarAhorcado(intentos);
+				
+				cout << "Jugador 2, adivina la palabra: ";
+				for (char letra : letrasCorrectas) {
+					cout << letra << " ";
+				}
+				cout << endl;
+				
+				char letra;
+				cout << "Ingresa una letra: ";
+				cin >> letra;
+				
+				if (adivinarLetra(letra, palabra, letrasCorrectas)) {
+					cout << "¡Correcto!" << endl;
+					
+					if (palabraAdivinada(letrasCorrectas)) {
+						cout << "¡Felicidades! Has adivinado la palabra: " << palabra << endl;
+						break;
+					}
+				} else {
+					cout << "Incorrecto. Intenta de nuevo." << endl;
+					intentos++;
+				}
+			}
+			
+			if (intentos == 6) {
+				cout << endl;
+				dibujarAhorcado(intentos);
+				cout << "¡Has perdido! La palabra correcta era: " << palabra << endl;
+			}
+			break;
+		}	
+		case 4: {
+			cout << "¡Hasta luego!" << endl;
+			return 0;
+		}	
+		default:
+			cout << "Opción inválida. Por favor, selecciona una opción válida." << endl;
+			break;
+		}
+		cout << endl;
+	}
+	cout << "¡Gracias por jugar! ¡Hasta luego!" << endl;
+	
+	return 0;
+}
 
-# Executables
-*.exe
-*.out
-*.app
